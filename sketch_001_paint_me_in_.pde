@@ -1,19 +1,25 @@
 let img;
-let currentSizes = []; // Current sizes of tiles
-let targetSizes = [];  // Target sizes of tiles
-const tileCount = 150; // Maximum number of tiles
-let tileSize;          // Size of each tile
+let currentSizes = [];  // Current sizes of tiles
+let targetSizes = [];   // Target sizes of tiles
+let tileCount = 150;    // Maximum number of tiles
+let tileSize;           // Size of each tile
+
+function preload() {
+  img = loadImage('me 3_.png');  // Preload the image
+}
 
 function setup() {
-  createCanvas(1920, 1080, WEBGL);
-  img = loadImage("https://github.com/lew1997/Webflow-paint-me-/blob/main/me%205.png?raw=true", img => {
-    img.resize(1920, 1080);
-  });
+  createCanvas(1920, 1080);
+  img.resize(1920, 1080);
 
   // Initialize grids to store tile sizes
   for (let i = 0; i < tileCount; i++) {
-    currentSizes[i] = new Array(tileCount).fill(0);
-    targetSizes[i] = new Array(tileCount).fill(0);
+    currentSizes[i] = [];
+    targetSizes[i] = [];
+    for (let j = 0; j < tileCount; j++) {
+      currentSizes[i][j] = 0; // Start with no size
+      targetSizes[i][j] = 0;  // Initial target size
+    }
   }
 
   // Calculate tile size based on screen width
@@ -26,8 +32,8 @@ function draw() {
   noStroke();
 
   // Determine the range of tiles that will be affected
-  let affectedTilesX = Math.min(tileCount, mouseX / tileSize + 50); // Influence width
-  let affectedTilesY = Math.min(tileCount, mouseY / tileSize + 50); // Influence height
+  let affectedTilesX = min(tileCount, mouseX / tileSize + 50); // Influence width
+  let affectedTilesY = min(tileCount, mouseY / tileSize + 50); // Influence height
 
   for (let x = 0; x < tileCount; x++) {
     for (let y = 0; y < tileCount; y++) {
@@ -35,7 +41,8 @@ function draw() {
       let yPos = y * tileSize;
 
       // Check if the current tile is within the range of the mouse interaction
-      if (Math.abs(mouseX - xPos) < tileSize * 6 && Math.abs(mouseY - yPos) < tileSize * 6) {
+      if (abs(mouseX - xPos) < tileSize * 6 && abs(mouseY - yPos) < tileSize * 6) {
+
         // Get brightness from the image at the tile position
         let c = img.get(int(xPos), int(yPos));
         let targetBrightness = map(brightness(c), 0, 255, 0, 1);
@@ -55,4 +62,3 @@ function draw() {
     }
   }
 }
-
