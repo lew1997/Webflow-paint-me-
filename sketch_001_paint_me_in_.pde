@@ -5,7 +5,7 @@ let tileCount = 150;    // Maximum number of tiles
 let tileSize;           // Size of each tile
 
 function preload() {
-  img = loadImage('me 3_.png');  // Preload the image
+  img = loadImage('https://github.com/lew1997/Webflow-paint-me-/blob/41ddbc86d1106013296d774de936cf4ff1dbb93a/me%205.png');  // Preload the image
 }
 
 function setup() {
