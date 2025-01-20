@@ -1,52 +1,43 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
-<script>
 let img;
-let currentSizes = [];
-let targetSizes = [];
-let tileCount = 150; // Maximum number of tiles
-let tileSize;
-
-function preload() {
-  img = loadImage('https://github.com/lew1997/Webflow-paint-me-/blob/87f7a2ce71ac1a16d53ad5aea4b80b38bcf570ea/me%205.png'); // Update with the correct URL
-}
+let currentSizes = []; // Current sizes of tiles
+let targetSizes = [];  // Target sizes of tiles
+const tileCount = 150; // Maximum number of tiles
+let tileSize;          // Size of each tile
 
 function setup() {
-  createCanvas(1920, 1080, WEBGL); // Use WEBGL for 3D context
-  img.resize(1920, 1080);
+  createCanvas(1920, 1080, WEBGL);
+  img = loadImage("https://github.com/lew1997/Webflow-paint-me-/blob/main/me%205.png?raw=true", img => {
+    img.resize(1920, 1080);
+  });
 
   // Initialize grids to store tile sizes
-  for (let x = 0; x < tileCount; x++) {
-    currentSizes[x] = [];
-    targetSizes[x] = [];
-    for (let y = 0; y < tileCount; y++) {
-      currentSizes[x][y] = 0; // Start with no size
-      targetSizes[x][y] = 0;  // Initial target size
-    }
+  for (let i = 0; i < tileCount; i++) {
+    currentSizes[i] = new Array(tileCount).fill(0);
+    targetSizes[i] = new Array(tileCount).fill(0);
   }
 
-  tileSize = width / tileCount; // Calculate tile size based on screen width
+  // Calculate tile size based on screen width
+  tileSize = width / tileCount;
 }
 
 function draw() {
-  background(241); // #f1f1f1
+  background(241, 241, 241);
+  fill(0);
   noStroke();
 
-  // Determine the range of tiles affected
-  let affectedTilesX = min(tileCount, mouseX / tileSize + 50);
-  let affectedTilesY = min(tileCount, mouseY / tileSize + 50);
+  // Determine the range of tiles that will be affected
+  let affectedTilesX = Math.min(tileCount, mouseX / tileSize + 50); // Influence width
+  let affectedTilesY = Math.min(tileCount, mouseY / tileSize + 50); // Influence height
 
   for (let x = 0; x < tileCount; x++) {
     for (let y = 0; y < tileCount; y++) {
-      let xPos = x * tileSize - width / 2; // Adjust for WEBGL origin
-      let yPos = y * tileSize - height / 2;
+      let xPos = x * tileSize;
+      let yPos = y * tileSize;
 
       // Check if the current tile is within the range of the mouse interaction
-      if (abs(mouseX - xPos) < tileSize * 6 && abs(mouseY - yPos) < tileSize * 6) {
+      if (Math.abs(mouseX - xPos) < tileSize * 6 && Math.abs(mouseY - yPos) < tileSize * 6) {
         // Get brightness from the image at the tile position
-        let imgX = int((x / tileCount) * img.width);
-        let imgY = int((y / tileCount) * img.height);
-        let c = img.get(imgX, imgY);
-
+        let c = img.get(int(xPos), int(yPos));
         let targetBrightness = map(brightness(c), 0, 255, 0, 1);
 
         // Set the target size based on brightness
@@ -58,10 +49,10 @@ function draw() {
 
       // Draw the tile
       push();
-      translate(xPos, yPos, 0);
+      translate(xPos, yPos);
       ellipse(0, 0, currentSizes[x][y], currentSizes[x][y]);
       pop();
     }
   }
 }
-</script>
+
