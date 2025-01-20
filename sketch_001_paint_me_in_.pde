@@ -7,7 +7,7 @@ let tileCount = 150; // Maximum number of tiles
 let tileSize;
 
 function preload() {
-  img = loadImage('https://drive.google.com/uc?id=FILE_ID'); // Update with the correct URL
+  img = loadImage('https://github.com/lew1997/Webflow-paint-me-/blob/87f7a2ce71ac1a16d53ad5aea4b80b38bcf570ea/me%205.png'); // Update with the correct URL
 }
 
 function setup() {
