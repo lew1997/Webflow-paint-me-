@@ -1,64 +1,99 @@
 let img;
-let currentSizes = [];  // Current sizes of tiles
-let targetSizes = [];   // Target sizes of tiles
-let tileCount = 150;    // Maximum number of tiles
-let tileSize;           // Size of each tile
+let currentSizes = [];
+let targetSizes = [];
+const tileCount = 100; // Reduce tile count for performance
+let tileSize;
 
 function preload() {
-  img = loadImage('https://github.com/lew1997/Webflow-paint-me-/blob/41ddbc86d1106013296d774de936cf4ff1dbb93a/me%205.png');  // Preload the image
+  // Use the raw image URL
+  img = loadImage("https://raw.githubusercontent.com/lew1997/Webflow-paint-me-/653cdac05e24a7852088d0f7c2e59a4644d911da/me%205.png");
 }
 
 function setup() {
-  createCanvas(1920, 1080);
-  img.resize(1920, 1080);
+  createCanvas(windowWidth, windowHeight, WEBGL);
 
-  // Initialize grids to store tile sizes
-  for (let i = 0; i < tileCount; i++) {
-    currentSizes[i] = [];
-    targetSizes[i] = [];
-    for (let j = 0; j < tileCount; j++) {
-      currentSizes[i][j] = 0; // Start with no size
-      targetSizes[i][j] = 0;  // Initial target size
+  // Adjust image size to match the window's aspect ratio
+  let imgAspectRatio = img.width / img.height;
+  let canvasAspectRatio = width / height;
+
+  if (canvasAspectRatio > imgAspectRatio) {
+    // Canvas is wider than the image's aspect ratio
+    img.resize(height * imgAspectRatio, height);
+  } else {
+    // Canvas is taller than the image's aspect ratio
+    img.resize(width, width / imgAspectRatio);
+  }
+
+  // Initialize grids
+  for (let x = 0; x < tileCount; x++) {
+    currentSizes[x] = [];
+    targetSizes[x] = [];
+    for (let y = 0; y < tileCount; y++) {
+      currentSizes[x][y] = 0;
+      targetSizes[x][y] = 0;
     }
   }
 
-  // Calculate tile size based on screen width
   tileSize = width / tileCount;
 }
 
 function draw() {
   background(241, 241, 241);
-  fill(0);
   noStroke();
 
-  // Determine the range of tiles that will be affected
-  let affectedTilesX = min(tileCount, mouseX / tileSize + 50); // Influence width
-  let affectedTilesY = min(tileCount, mouseY / tileSize + 50); // Influence height
+  // Translate origin to top-left corner
+  translate(-width / 2, -height / 2);
 
   for (let x = 0; x < tileCount; x++) {
     for (let y = 0; y < tileCount; y++) {
-      let xPos = x * tileSize;
-      let yPos = y * tileSize;
+      // Correct tile position
+      let xPos = x * tileSize + tileSize / 2;
+      let yPos = y * tileSize + tileSize / 2;
 
-      // Check if the current tile is within the range of the mouse interaction
-      if (abs(mouseX - xPos) < tileSize * 6 && abs(mouseY - yPos) < tileSize * 6) {
+      // Adjust mouse coordinates for WEBGL
+      let mouseAdjustedX = mouseX - width / 2;
+      let mouseAdjustedY = mouseY - height / 2;
 
-        // Get brightness from the image at the tile position
-        let c = img.get(int(xPos), int(yPos));
-        let targetBrightness = map(brightness(c), 0, 255, 0, 1);
+      // Check if tile is affected by the mouse
+      let d = dist(mouseAdjustedX, mouseAdjustedY, xPos, yPos);
+      if (d < tileSize * 20) {
+        // Correct image mapping
+        let imgX = map(xPos, 0, width, 0, img.width);
+        let imgY = map(yPos, 0, height, 0, img.height);
 
-        // Set the target size based on brightness
+        // Get brightness from image
+        let c = img.get(int(imgX), int(imgY));
+        let targetBrightness = map(brightness(c), 0, 100, 0, 1);
+
+        // Set target size based on brightness
         targetSizes[x][y] = tileSize * targetBrightness;
       }
 
-      // Smoothly interpolate current size toward target size
+      // Smooth interpolation
       currentSizes[x][y] = lerp(currentSizes[x][y], targetSizes[x][y], 0.1);
 
       // Draw the tile
       push();
-      translate(xPos, yPos);
+      translate(xPos, yPos, 0);
+      fill(0);
       ellipse(0, 0, currentSizes[x][y], currentSizes[x][y]);
       pop();
     }
   }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+
+  // Adjust image size again on window resize
+  let imgAspectRatio = img.width / img.height;
+  let canvasAspectRatio = width / height;
+
+  if (canvasAspectRatio > imgAspectRatio) {
+    img.resize(height * imgAspectRatio, height);
+  } else {
+    img.resize(width, width / imgAspectRatio);
+  }
+
+  tileSize = width / tileCount;
 }
