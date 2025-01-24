@@ -1,5 +1,5 @@
 <!-- Include p5.js library -->
-<script src="https://github.com/lew1997/Webflow-paint-me-/blob/46c76277c49996b902b0a41f3832cbb08fff11c6/sketch_001_paint_me_in_.pde"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
 
 <!-- Custom JavaScript -->
 <script>
@@ -102,6 +102,7 @@
       tileSize = width / tileCount;
     }
 
+    // Attach p5.js functions to the global scope
     window.preload = preload;
     window.setup = setup;
     window.draw = draw;
